@@ -2,7 +2,7 @@ export type Region = 'hk' | 'kln' | 'nt';
 
 export type CourseType = 'regular' | 'diving';
 
-export type DivingCategory = 'child' | 'adult' | 'elderly';
+export type CourseCategory = 'bb' | 'child' | 'adult' | 'elderly';
 
 export interface Course {
   id: string;
@@ -10,7 +10,7 @@ export interface Course {
   address?: string;
   type: CourseType;
   region?: Region;
-  category?: DivingCategory;
+  category?: CourseCategory;
   image?: string;
 }
 
@@ -20,4 +20,3 @@ export interface TimeSlot {
   time: string;
   available: boolean;
 }
-

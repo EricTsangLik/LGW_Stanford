@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Filter, FilterRegion } from '../components/Filter';
+import { Filter, FilterRegion, FilterCategory } from '../components/Filter';
 import { CourseCard } from '../components/CourseCard';
 import { regularCourses, divingCourses } from '../data/courses';
 import { Search } from 'lucide-react';
@@ -9,10 +9,13 @@ export const HomePage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRegion, setSelectedRegion] = useState<FilterRegion>('all');
+  const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('all');
 
   const filteredCourses = useMemo(() => {
     const query = searchQuery.toLowerCase().trim();
-    
+    let courses = [...regularCourses]; // Default to regular courses
+
+    // If search query is present
     if (query) {
       const isDivingSearch = query.includes('diving') || query.includes('dive') || query.includes('潛水');
       
@@ -20,24 +23,33 @@ export const HomePage = () => {
         return divingCourses;
       }
 
-      const matches = regularCourses.filter(course => 
+      // Filter by text match
+      courses = regularCourses.filter(course => 
         course.name.toLowerCase().includes(query) || 
         course.address?.toLowerCase().includes(query)
       );
 
+      // Include diving matches if text matches
       const divingMatches = divingCourses.filter(course => 
         course.name.toLowerCase().includes(query)
       );
+      courses = [...courses, ...divingMatches];
+    } else {
+      // Normal filtering (only apply to regular courses if no search)
+      
+      // Filter by Region
+      if (selectedRegion !== 'all') {
+        courses = courses.filter(course => course.region === selectedRegion);
+      }
 
-      return [...matches, ...divingMatches];
+      // Filter by Category
+      if (selectedCategory !== 'all') {
+        courses = courses.filter(course => course.category === selectedCategory);
+      }
     }
 
-    if (selectedRegion === 'all') {
-      return regularCourses;
-    }
-
-    return regularCourses.filter(course => course.region === selectedRegion);
-  }, [searchQuery, selectedRegion]);
+    return courses;
+  }, [searchQuery, selectedRegion, selectedCategory]);
 
   const isShowingDiving = filteredCourses.some(c => c.type === 'diving');
 
@@ -61,7 +73,9 @@ export const HomePage = () => {
       {!searchQuery && !isShowingDiving && (
         <Filter 
           selectedRegion={selectedRegion} 
-          onRegionChange={setSelectedRegion} 
+          onRegionChange={setSelectedRegion}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
         />
       )}
 
