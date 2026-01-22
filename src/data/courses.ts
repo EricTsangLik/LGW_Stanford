@@ -162,17 +162,43 @@ const locations = [
   }
 ] as const;
 
-export const regularCourses: Course[] = locations.flatMap(loc => [
-  {
-    id: `${loc.baseId}-bb`,
-    name: `${loc.name} (BB班)`,
-    address: loc.address,
-    type: 'regular',
-    region: loc.region,
-    image: loc.image,
-    category: 'bb'
-  },
-  {
+const waterBabiesLocations = [
+  'nt-1', // 浸信會沙田圍呂明才小學
+  'nt-4', // 大埔舊墟公立學校(寶湖道)
+  'nt-5', // 安基司學校(元朗)
+  'nt-6', // 梁安琪泳池綜合大樓
+  'kln-2', // 基督教祟真中學
+  'kln-4', // 香港澳洲國際學校
+  'kln-6', // Nord Anglia International School (Kwun Tong)
+  'hk-1', // 韓國國際學校
+  'hk-2'  // 香港真光中學
+];
+
+const adultCoursesLocations = [
+  'kln-2', // 基督教祟真中學
+  'nt-1',  // 浸信會沙田圍呂明才小學
+  'kln-9', // 保良局黃永樹小學
+  'hk-2'   // 香港真光中學
+];
+
+export const regularCourses: Course[] = locations.flatMap(loc => {
+  const courses: Course[] = [];
+
+  // Add Waterbabies course only for specific locations
+  if (waterBabiesLocations.includes(loc.baseId)) {
+    courses.push({
+      id: `${loc.baseId}-bb`,
+      name: `${loc.name} (Waterbabies)`,
+      address: loc.address,
+      type: 'regular',
+      region: loc.region,
+      image: loc.image,
+      category: 'bb'
+    });
+  }
+
+  // Add Child courses for all locations
+  courses.push({
     id: `${loc.baseId}-child`,
     name: `${loc.name} (兒童班)`,
     address: loc.address,
@@ -180,17 +206,23 @@ export const regularCourses: Course[] = locations.flatMap(loc => [
     region: loc.region,
     image: loc.image,
     category: 'child'
-  },
-  {
-    id: `${loc.baseId}-adult`,
-    name: `${loc.name} (成人班)`,
-    address: loc.address,
-    type: 'regular',
-    region: loc.region,
-    image: loc.image,
-    category: 'adult'
+  });
+
+  // Add Adult course only for specific locations
+  if (adultCoursesLocations.includes(loc.baseId)) {
+    courses.push({
+      id: `${loc.baseId}-adult`,
+      name: `${loc.name} (成人班)`,
+      address: loc.address,
+      type: 'regular',
+      region: loc.region,
+      image: loc.image,
+      category: 'adult'
+    });
   }
-]);
+
+  return courses;
+});
 
 export const divingCourses: Course[] = [
   {

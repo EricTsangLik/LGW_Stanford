@@ -3,15 +3,36 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Course } from '../types';
 import { regularCourses, divingCourses } from '../data/courses';
 import { CourseCard } from '../components/CourseCard';
-import { ArrowLeft, Calendar, CheckCircle, Image as ImageIcon, Clock, Info } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Info, ChevronLeft, ChevronRight, Pause, Play, Tag, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhHK } from 'date-fns/locale';
 
 const TIME_SLOTS = [
-  '09:30-12:30',
-  '14:00-17:00',
-  '18:00-21:00'
+  '09:30-10:30',
+  '10:30-11:30',
+  '11:30-12:30',
+  '12:30-13:30',
+  '13:30-14:30',
+  '14:30-15:30',
+  '15:30-16:30',
+  '16:30-17:30'
 ];
+
+const SLIDESHOW_IMAGES = [
+  '/single%20course/slides%20show/TA_長沙灣-崇真中學.jpg',
+  '/single%20course/slides%20show/TA呂灝峰.jpeg',
+  '/single%20course/slides%20show/WhatsApp%20Image%202025-11-29%20at%2016.03.41.jpeg',
+  '/single%20course/slides%20show/WhatsApp%20Image%202025-11-29%20at%2016.03.42%20(1).jpeg',
+  '/single%20course/slides%20show/WhatsApp%20Image%202025-11-29%20at%2016.03.42%20(2).jpeg',
+  '/single%20course/slides%20show/WhatsApp%20Image%202025-11-29%20at%2016.03.42.jpeg',
+  '/single%20course/slides%20show/WhatsApp%20Image%202025-11-30%20at%2009.03.04.jpeg'
+];
+
+const VERTICAL_INFO_IMAGES = [
+  'info1.jpeg', 'info2.jpeg', 'info3.jpeg', 'info4.jpeg',
+  'info5.jpeg', 'info6.jpeg', 'info7.jpeg', 'info8.jpeg',
+  'info9.jpeg', 'info10.jpeg', 'info11.jpeg'
+].map(filename => `/single%20course/vertical%20info/${filename}`);
 
 export const CoursePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +44,38 @@ export const CoursePage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [confirmed, setConfirmed] = useState(false);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  const [discountCode, setDiscountCode] = useState('');
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const originalPrice = 398;
+  const finalPrice = discountApplied ? Math.round(originalPrice * 0.8) : originalPrice;
+
+  const handleApplyDiscount = () => {
+    if (discountCode.trim() === '2026mkt') {
+      setDiscountApplied(true);
+    } else {
+      alert('無效的優惠碼');
+      setDiscountApplied(false);
+    }
+  };
+
+  const handleClearDiscount = () => {
+    setDiscountCode('');
+    setDiscountApplied(false);
+  };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (!isPaused) {
+      interval = setInterval(() => {
+        setCurrentSlideIndex((prev) => (prev + 1) % SLIDESHOW_IMAGES.length);
+      }, 3000);
+    }
+    return () => clearInterval(interval);
+  }, [isPaused]);
 
   useEffect(() => {
     const foundCourse = [...regularCourses, ...divingCourses].find(c => c.id === id);
@@ -40,17 +93,30 @@ export const CoursePage: React.FC = () => {
         setRelatedCourses([]);
       }
       
-      // Generate 12 random unique dates in Dec 2025
+      // Generate dates in Jan 2026 based on category
       const dates: Date[] = [];
-      const usedDays = new Set<number>();
-      
-      while (dates.length < 12) {
-        const day = Math.floor(Math.random() * 31) + 1;
-        if (!usedDays.has(day)) {
-            usedDays.add(day);
-            dates.push(new Date(2025, 11, day));
+      const year = 2026;
+      const month = 0; // January
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const dayOfWeek = date.getDay(); // 0 is Sunday, 5 is Friday, 6 is Saturday
+
+        if (foundCourse.category === 'adult') {
+           // Adult: All dates
+           dates.push(date);
+        } else if (foundCourse.category === 'bb' || foundCourse.category === 'child') {
+           // Waterbabies & Child: Fri/Sat/Sun only
+           if (dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6) {
+             dates.push(date);
+           }
+        } else {
+           // Default fallback (e.g. elderly or others): All dates
+           dates.push(date);
         }
       }
+      
       dates.sort((a, b) => a.getTime() - b.getTime());
       setAvailableDates(dates);
       
@@ -63,7 +129,7 @@ export const CoursePage: React.FC = () => {
 
   const handleConfirm = () => {
     if (selectedDate && selectedTime) {
-      setConfirmed(true);
+      setShowLoginModal(true);
     }
   };
 
@@ -73,15 +139,89 @@ export const CoursePage: React.FC = () => {
 
   return (
     <div className="course-detail-page">
-      <div className="detail-header">
-        {course.image ? (
-          <img src={course.image} alt={course.name} className="detail-image" />
-        ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <ImageIcon size={64} className="text-gray-400" />
-          </div>
-        )}
+      <div className="detail-header relative group">
+        <img 
+          src={SLIDESHOW_IMAGES[currentSlideIndex]} 
+          alt={`Slide ${currentSlideIndex + 1}`} 
+          className="detail-image" 
+        />
+        
+        <div className="absolute inset-0 bg-black bg-opacity-10 group-hover:bg-opacity-20 transition-all duration-300" />
+
+        <button 
+          onClick={() => {
+            setCurrentSlideIndex((prev) => (prev - 1 + SLIDESHOW_IMAGES.length) % SLIDESHOW_IMAGES.length);
+            setIsPaused(true);
+          }}
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
+        >
+          <ChevronLeft size={24} />
+        </button>
+
+        <button 
+          onClick={() => {
+            setCurrentSlideIndex((prev) => (prev + 1) % SLIDESHOW_IMAGES.length);
+            setIsPaused(true);
+          }}
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
+        >
+          <ChevronRight size={24} />
+        </button>
+
+        <button
+          onClick={() => setIsPaused(!isPaused)}
+          className="absolute bottom-4 right-4 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
+        >
+          {isPaused ? <Play size={20} /> : <Pause size={20} />}
+        </button>
+
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+          {SLIDESHOW_IMAGES.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                setCurrentSlideIndex(idx);
+                setIsPaused(true);
+              }}
+              className={`w-2 h-2 rounded-full transition-all ${
+                idx === currentSlideIndex ? 'bg-white w-4' : 'bg-white/50 hover:bg-white/80'
+              }`}
+            />
+          ))}
+        </div>
       </div>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full overflow-hidden transform transition-all scale-100 opacity-100">
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Info size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">請先登入</h3>
+              <p className="text-gray-600 mb-6">
+                預約課程需要會員登入，請前往官方網站登入或註冊。
+              </p>
+              
+              <div className="flex flex-col gap-3">
+                <a
+                  href="https://stanfordswim.com.hk/login"
+                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-bold transition-colors flex items-center justify-center"
+                >
+                  前往登入
+                </a>
+                <button
+                  onClick={() => setShowLoginModal(false)}
+                  className="w-full px-4 py-3 text-gray-500 font-medium hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  稍後再說
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="detail-content">
         <button onClick={() => navigate('/')} className="back-btn">
@@ -92,46 +232,12 @@ export const CoursePage: React.FC = () => {
         <h1 className="detail-title">{course.name}</h1>
         {course.address && <p className="text-gray-600 text-lg mb-8">{course.address}</p>}
         
-        {/* Schedule Information List */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-8 shadow-sm">
-            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <Info className="mr-2 text-blue-600" size={20} />
-                課程時間表 (2025年12月)
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <h4 className="font-medium text-gray-600 mb-3 flex items-center">
-                        <Calendar size={16} className="mr-2" />
-                        可預約日期
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                        {availableDates.map((date) => (
-                            <span key={date.toISOString()} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                                {format(date, 'M月d日', { locale: zhHK })}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-                <div>
-                    <h4 className="font-medium text-gray-600 mb-3 flex items-center">
-                        <Clock size={16} className="mr-2" />
-                        時段選擇
-                    </h4>
-                    <div className="space-y-2">
-                        {TIME_SLOTS.map((slot) => (
-                            <div key={slot} className="flex items-center text-gray-700">
-                                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                                {slot}
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </div>
+        
 
         <div className="booking-section border-t pt-8">
           <h2 className="booking-title text-xl">
-            預約課程
+          <Info className="mr-2 text-blue-600" size={20} />
+            選擇開班日期（2026年1月份）
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -180,6 +286,68 @@ export const CoursePage: React.FC = () => {
             </div>
           </div>
 
+          {/* Pricing Section */}
+          <div className="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+              <Tag className="mr-2 text-blue-600" size={20} />
+              課程費用
+            </h3>
+            
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-gray-500 text-sm">每堂費用:</span>
+                  {discountApplied ? (
+                    <>
+                      <span className="text-gray-400 line-through text-lg">${originalPrice}</span>
+                      <span className="text-2xl font-bold text-red-600">${finalPrice}</span>
+                    </>
+                  ) : (
+                    <span className="text-2xl font-bold text-gray-900">${originalPrice}</span>
+                  )}
+                </div>
+                {discountApplied && (
+                  <p className="text-green-600 text-sm mt-1 flex items-center">
+                    <CheckCircle size={14} className="mr-1" />
+                    已套用優惠 (20% OFF)
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={discountCode}
+                    onChange={(e) => setDiscountCode(e.target.value)}
+                    placeholder="輸入優惠碼"
+                    disabled={discountApplied || confirmed}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-48 pr-10"
+                  />
+                  {discountCode && !confirmed && (
+                    <button
+                      onClick={handleClearDiscount}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={handleApplyDiscount}
+                  disabled={discountApplied || confirmed || !discountCode}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    discountApplied
+                      ? 'bg-green-100 text-green-700 cursor-default'
+                      : 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  {discountApplied ? '已套用' : '兌換'}
+                </button>
+              </div>
+            </div>
+          </div>
+
           {(selectedDate || selectedTime) && (
               <div className="bg-blue-50 p-4 rounded-lg mb-6 flex items-center text-blue-800 border border-blue-100">
                   <span className="font-medium mr-2">已選時段:</span>
@@ -204,6 +372,25 @@ export const CoursePage: React.FC = () => {
                 確認預約
               </button>
             )}
+          </div>
+        </div>
+
+        {/* Vertical Info Images Section */}
+        <div className="vertical-info-section border-t pt-12 mb-12">
+          <h3 className="text-2xl font-bold text-gray-800 mb-6">
+            課程資訊
+          </h3>
+          <div className="grid grid-cols-1 gap-6">
+            {VERTICAL_INFO_IMAGES.map((imgSrc, index) => (
+              <div key={index} className="w-full rounded-xl overflow-hidden shadow-sm border border-gray-100">
+                <img 
+                  src={imgSrc} 
+                  alt={`Course Info ${index + 1}`} 
+                  className="w-full h-auto"
+                  loading="lazy"
+                />
+              </div>
+            ))}
           </div>
         </div>
 

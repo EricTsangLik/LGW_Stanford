@@ -26,7 +26,7 @@ export const Filter: React.FC<FilterProps> = ({
 
   const categories: { id: FilterCategory; label: string }[] = [
     { id: 'all', label: '全部課程' },
-    { id: 'bb', label: 'BB班' },
+    { id: 'bb', label: 'Waterbabies' },
     { id: 'child', label: '兒童班' },
     { id: 'adult', label: '成人班' },
   ];
