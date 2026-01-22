@@ -187,13 +187,13 @@ export const regularCourses: Course[] = locations.flatMap(loc => {
   // Add Waterbabies course only for specific locations
   if (waterBabiesLocations.includes(loc.baseId)) {
     courses.push({
-      id: `${loc.baseId}-bb`,
+      id: `${loc.baseId}-waterbabies`,
       name: `${loc.name} (Waterbabies)`,
       address: loc.address,
       type: 'regular',
       region: loc.region,
       image: loc.image,
-      category: 'bb'
+      category: 'waterbabies'
     });
   }
 

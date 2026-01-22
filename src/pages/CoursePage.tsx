@@ -68,7 +68,7 @@ export const CoursePage: React.FC = () => {
   };
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (!isPaused) {
       interval = setInterval(() => {
         setCurrentSlideIndex((prev) => (prev + 1) % SLIDESHOW_IMAGES.length);
@@ -106,7 +106,7 @@ export const CoursePage: React.FC = () => {
         if (foundCourse.category === 'adult') {
            // Adult: All dates
            dates.push(date);
-        } else if (foundCourse.category === 'bb' || foundCourse.category === 'child') {
+        } else if (foundCourse.category === 'waterbabies' || foundCourse.category === 'child') {
            // Waterbabies & Child: Fri/Sat/Sun only
            if (dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6) {
              dates.push(date);

@@ -2,7 +2,7 @@ export type Region = 'hk' | 'kln' | 'nt';
 
 export type CourseType = 'regular' | 'diving';
 
-export type CourseCategory = 'bb' | 'child' | 'adult' | 'elderly';
+export type CourseCategory = 'waterbabies' | 'child' | 'adult' | 'elderly';
 
 export interface Course {
   id: string;

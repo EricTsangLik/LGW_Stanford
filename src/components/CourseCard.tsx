@@ -22,7 +22,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onClick }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isHovered) {
       interval = setInterval(() => {
         setCurrentImageIndex((prev) => (prev + 1) % SLIDESHOW_IMAGES.length);
