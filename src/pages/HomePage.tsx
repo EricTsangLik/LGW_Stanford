@@ -44,7 +44,19 @@ export const HomePage = () => {
 
       // Filter by Category
       if (selectedCategory !== 'all') {
-        courses = courses.filter(course => course.category === selectedCategory);
+        if (selectedCategory === 'under3') {
+          // "below age of 3": waterbabies
+          courses = courses.filter(course => course.category === 'waterbabies');
+        } else if (selectedCategory === '3to12' || selectedCategory === '12to18') {
+          // "age of 3 - 12" & "age of 12 - 18": 兒童班
+          courses = courses.filter(course => course.category === 'child');
+        } else if (selectedCategory === 'above18') {
+          // "above age of 18": 成人班
+          courses = courses.filter(course => course.category === 'adult');
+        } else {
+           // Fallback for direct category matches if any
+           courses = courses.filter(course => course.category === (selectedCategory as any));
+        }
       }
     }
 

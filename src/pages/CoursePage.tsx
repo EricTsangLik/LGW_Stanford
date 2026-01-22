@@ -151,7 +151,7 @@ export const CoursePage: React.FC = () => {
         <button 
           onClick={() => {
             setCurrentSlideIndex((prev) => (prev - 1 + SLIDESHOW_IMAGES.length) % SLIDESHOW_IMAGES.length);
-            setIsPaused(true);
+            setIsPaused(false);
           }}
           className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
         >
@@ -161,19 +161,13 @@ export const CoursePage: React.FC = () => {
         <button 
           onClick={() => {
             setCurrentSlideIndex((prev) => (prev + 1) % SLIDESHOW_IMAGES.length);
-            setIsPaused(true);
+            setIsPaused(false);
           }}
           className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
         >
           <ChevronRight size={24} />
         </button>
 
-        <button
-          onClick={() => setIsPaused(!isPaused)}
-          className="absolute bottom-4 right-4 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100"
-        >
-          {isPaused ? <Play size={20} /> : <Pause size={20} />}
-        </button>
 
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
           {SLIDESHOW_IMAGES.map((_, idx) => (
@@ -361,7 +355,7 @@ export const CoursePage: React.FC = () => {
             {confirmed ? (
               <div className="flex items-center text-green-600 bg-green-50 px-6 py-3 rounded-lg border border-green-200">
                 <CheckCircle size={24} className="mr-2" />
-                <span className="font-bold text-lg">預約已確認！</span>
+                <span className="font-bold text-lg">課堂已確認！</span>
               </div>
             ) : (
               <button
@@ -369,7 +363,7 @@ export const CoursePage: React.FC = () => {
                 onClick={handleConfirm}
                 className="confirm-btn"
               >
-                確認預約
+                確認已選課堂
               </button>
             )}
           </div>

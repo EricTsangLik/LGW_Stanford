@@ -2,7 +2,7 @@ import React from 'react';
 import { Region, CourseCategory } from '../types';
 
 export type FilterRegion = Region | 'all';
-export type FilterCategory = CourseCategory | 'all';
+export type FilterCategory = CourseCategory | 'all' | 'under3' | '3to12' | '12to18' | 'above18';
 
 interface FilterProps {
   selectedRegion: FilterRegion;
@@ -26,9 +26,10 @@ export const Filter: React.FC<FilterProps> = ({
 
   const categories: { id: FilterCategory; label: string }[] = [
     { id: 'all', label: '全部課程' },
-    { id: 'waterbabies', label: 'Waterbabies' },
-    { id: 'child', label: '兒童班' },
-    { id: 'adult', label: '成人班' },
+    { id: 'under3', label: '3歲以下' },
+    { id: '3to12', label: '3歲 - 12歲' },
+    { id: '12to18', label: '12歲 - 18歲' },
+    { id: 'above18', label: '18歲以上' },
   ];
 
   return (
