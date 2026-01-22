@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Course } from '../types';
 import { regularCourses, divingCourses } from '../data/courses';
 import { CourseCard } from '../components/CourseCard';
-import { ArrowLeft, CheckCircle, Info, ChevronLeft, ChevronRight, Pause, Play, Tag, X } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Info, ChevronLeft, ChevronRight, Tag, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhHK } from 'date-fns/locale';
 
