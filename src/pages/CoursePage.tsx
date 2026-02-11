@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Course } from '../types';
 import { regularCourses, divingCourses } from '../data/courses';
 import { CourseCard } from '../components/CourseCard';
-import { ArrowLeft, CheckCircle, Info, ChevronLeft, ChevronRight, Tag, X } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Info, ChevronLeft, ChevronRight, Tag, X, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhHK } from 'date-fns/locale';
 
@@ -93,10 +93,10 @@ export const CoursePage: React.FC = () => {
         setRelatedCourses([]);
       }
       
-      // Generate dates in Jan 2026 based on category
+      // Generate dates in Feb 2026 based on category
       const dates: Date[] = [];
       const year = 2026;
-      const month = 0; // January
+      const month = 1; // February
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
       for (let day = 1; day <= daysInMonth; day++) {
@@ -224,14 +224,27 @@ export const CoursePage: React.FC = () => {
         </button>
 
         <h1 className="detail-title">{course.name}</h1>
-        {course.address && <p className="text-gray-600 text-lg mb-8">{course.address}</p>}
+        {course.address && (
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-8">
+            <p className="text-gray-600 text-lg">{course.address}</p>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(course.address)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-sm font-medium transition-colors w-fit"
+            >
+              <MapPin size={18} />
+              查看地圖
+            </a>
+          </div>
+        )}
         
         
 
         <div className="booking-section border-t pt-8">
           <h2 className="booking-title text-xl">
           <Info className="mr-2 text-blue-600" size={20} />
-            選擇開班日期（2026年1月份）
+            選擇開班日期（2026年2月份）
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

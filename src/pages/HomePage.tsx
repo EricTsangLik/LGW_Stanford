@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Filter, FilterRegion, FilterCategory } from '../components/Filter';
+import { Filter, FilterRegion, FilterAge, FilterCategory } from '../components/Filter';
 import { CourseCard } from '../components/CourseCard';
 import { regularCourses, divingCourses } from '../data/courses';
 import { Search } from 'lucide-react';
@@ -9,6 +9,7 @@ export const HomePage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRegion, setSelectedRegion] = useState<FilterRegion>('all');
+  const [selectedAge, setSelectedAge] = useState<FilterAge>('all');
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('all');
 
   const filteredCourses = useMemo(() => {
@@ -42,26 +43,34 @@ export const HomePage = () => {
         courses = courses.filter(course => course.region === selectedRegion);
       }
 
+      // Filter by Age
+      if (selectedAge !== 'all') {
+        courses = courses.filter(course => {
+          const cat = course.category;
+          if (selectedAge === 'under3') {
+             return cat === 'waterbabies';
+          }
+          if (selectedAge === '3to12') {
+             return cat === 'child' || cat === 'squad' || cat === 'special_needs';
+          }
+          if (selectedAge === '12to18') {
+             return cat === 'child' || cat === 'squad' || cat === 'special_needs';
+          }
+          if (selectedAge === 'above18') {
+             return cat === 'adult' || cat === 'elderly';
+          }
+          return true;
+        });
+      }
+
       // Filter by Category
       if (selectedCategory !== 'all') {
-        if (selectedCategory === 'under3') {
-          // "below age of 3": waterbabies
-          courses = courses.filter(course => course.category === 'waterbabies');
-        } else if (selectedCategory === '3to12' || selectedCategory === '12to18') {
-          // "age of 3 - 12" & "age of 12 - 18": 兒童班
-          courses = courses.filter(course => course.category === 'child');
-        } else if (selectedCategory === 'above18') {
-          // "above age of 18": 成人班
-          courses = courses.filter(course => course.category === 'adult');
-        } else {
-           // Fallback for direct category matches if any
-           courses = courses.filter(course => course.category === (selectedCategory as any));
-        }
+        courses = courses.filter(course => course.category === selectedCategory);
       }
     }
 
     return courses;
-  }, [searchQuery, selectedRegion, selectedCategory]);
+  }, [searchQuery, selectedRegion, selectedAge, selectedCategory]);
 
   const isShowingDiving = filteredCourses.some(c => c.type === 'diving');
 
@@ -86,6 +95,8 @@ export const HomePage = () => {
         <Filter 
           selectedRegion={selectedRegion} 
           onRegionChange={setSelectedRegion}
+          selectedAge={selectedAge}
+          onAgeChange={setSelectedAge}
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
         />

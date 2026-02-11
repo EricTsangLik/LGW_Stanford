@@ -75,9 +75,12 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onClick }) => {
         {course.category && (
           <div className="mt-2">
              <span className="course-tag">
-              {course.category === 'child' ? '兒童' : 
-               course.category === 'adult' ? '成人' : 
-               course.category === 'elderly' ? '長者' : course.category}
+              {course.category === 'child' ? '兒童泳班' : 
+               course.category === 'adult' ? '成人泳班' : 
+               course.category === 'squad' ? '泳隊' :
+               course.category === 'waterbabies' ? '嬰幼兒親子泳班' :
+               course.category === 'special_needs' ? '特殊需要泳班' :
+               course.category === 'elderly' ? '長者泳班' : course.category}
             </span>
           </div>
         )}

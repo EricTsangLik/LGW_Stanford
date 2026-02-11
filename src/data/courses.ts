@@ -181,6 +181,33 @@ const adultCoursesLocations = [
   'hk-2'   // 香港真光中學
 ];
 
+const squadLocations = [
+  'nt-5',  // 安基司學校
+  'kln-4', // 澳洲國際學校
+  'kln-1', // 宣道國際學校
+  'kln-6', // Nord Anglia International School (Kwun Tong)
+  'kln-8', // 法國國際學校
+  'hk-1',  // 韓國國際學校
+  'nt-7',  // 裘錦秋中學
+  'nt-1',  // 浸信會沙田圍呂明才小學
+  'kln-3', // 保良局顏寶鈴書院
+  'kln-7', // Nord Anglia International School (Lam Tin)
+  'nt-2',  // 保良局雨川小學
+  'kln-2', // 基督教祟真中學
+  'hk-2',  // 香港真光中學
+  'nt-4',  // 大埔舊墟公立學校(寶湖道)
+  'kln-5', // 匯基書院(東九龍)
+  'kln-9', // 保良局黃永樹小學
+  'nt-6'   // 梁安琪泳池綜合大樓
+];
+
+const specialNeedsLocations = [
+  'hk-3',   // 聖公會鄧肇堅中學
+  'kln-1',  // 宣道國際學校
+  'kln-10', // 景嶺書院
+  'nt-3'    // 香港墨爾文國際學校
+];
+
 export const regularCourses: Course[] = locations.flatMap(loc => {
   const courses: Course[] = [];
 
@@ -218,6 +245,32 @@ export const regularCourses: Course[] = locations.flatMap(loc => {
       region: loc.region,
       image: loc.image,
       category: 'adult'
+    });
+  }
+
+  // Add Squad course only for specific locations
+  if (squadLocations.includes(loc.baseId)) {
+    courses.push({
+      id: `${loc.baseId}-squad`,
+      name: `${loc.name} (泳隊)`,
+      address: loc.address,
+      type: 'regular',
+      region: loc.region,
+      image: loc.image,
+      category: 'squad'
+    });
+  }
+
+  // Add Special Needs course only for specific locations
+  if (specialNeedsLocations.includes(loc.baseId)) {
+    courses.push({
+      id: `${loc.baseId}-special-needs`,
+      name: `${loc.name} (特殊需要泳班)`,
+      address: loc.address,
+      type: 'regular',
+      region: loc.region,
+      image: loc.image,
+      category: 'special_needs'
     });
   }
 
